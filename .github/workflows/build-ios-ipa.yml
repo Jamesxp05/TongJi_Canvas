@@ -1,0 +1,38 @@
+name: Build unsigned iOS IPA
+on:
+  workflow_dispatch:
+  push:
+    branches: [build-ios-ipa]
+    paths: [.github/workflows/build-ios-ipa.yml]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build for iPhone
+        run: |
+          xcodebuild -project ios/TongJiCanvas.xcodeproj \
+            -scheme TongJiCanvas-Unsigned -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/TongJiBuild" \
+            ARCHS=arm64 CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+      - name: Verify and package IPA
+        run: |
+          app="$RUNNER_TEMP/TongJiBuild/Build/Products/Release-iphoneos/TongJiCanvas.app"
+          test -f "$app/TongJiCanvas"
+          test "$(lipo -archs "$app/TongJiCanvas")" = arm64
+          test ! -e "$app/_CodeSignature"
+          test ! -e "$app/embedded.mobileprovision"
+          mkdir Payload
+          cp -R "$app" Payload/
+          zip -qry TongJiCanvas-unsigned.ipa Payload
+          unzip -tq TongJiCanvas-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TongJiCanvas-unsigned
+          path: TongJiCanvas-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
