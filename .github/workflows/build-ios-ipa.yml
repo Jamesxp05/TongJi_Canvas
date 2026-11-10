@@ -11,9 +11,13 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build for iPhone
         run: |
+          xcode_path="$(find /Applications -maxdepth 1 -name 'Xcode_26*.app' | sort -V | tail -n 1)"
+          test -n "$xcode_path"
+          export DEVELOPER_DIR="$xcode_path/Contents/Developer"
+          xcodebuild -version
           xcodebuild -project ios/TongJiCanvas.xcodeproj \
             -scheme TongJiCanvas-Unsigned -configuration Release \
             -sdk iphoneos -destination 'generic/platform=iOS' \
