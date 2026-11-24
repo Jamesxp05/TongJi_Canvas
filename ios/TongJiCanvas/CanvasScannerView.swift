@@ -3,6 +3,7 @@ import SwiftUI
 struct CanvasScannerView: View {
     @StateObject private var scanner = CameraScannerModel()
     @EnvironmentObject private var accountStore: AccountStore
+    @EnvironmentObject private var historyStore: SignHistoryStore
     @State private var submittedScanID: UUID?
     @State private var submittedAccounts: [CanvasAccount] = []
     @State private var isSubmitting = false
@@ -234,7 +235,7 @@ struct CanvasScannerView: View {
                     } else {
                         result = CanvasSignResult(
                             status: .expiredSession,
-                            message: "找不到此账号的安全凭据，请重新登录并保存。",
+                            message: "尚未填写 Cookie，请到账号详情填写或重新登录。",
                             httpCode: nil,
                             courseName: nil
                         )
@@ -247,6 +248,11 @@ struct CanvasScannerView: View {
                 results[accountID] = result
             }
         }
+
+        let outcomes = submittedAccounts.compactMap { account in
+            results[account.id].map { (account: account, result: $0) }
+        }
+        historyStore.record(target: target, outcomes: outcomes)
     }
 }
 

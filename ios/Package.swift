@@ -9,17 +9,24 @@ let package = Package(
             name: "CanvasSignInCore",
             path: "TongJiCanvas",
             exclude: [
-                "AccountStore.swift",
                 "Assets.xcassets",
                 "CanvasLoginView.swift",
                 "CanvasLoginController.swift",
                 "ContentView.swift",
+                "CourseEditorView.swift",
                 "NativeQRScannerView.swift",
                 "CanvasScannerView.swift",
+                "SignHistoryView.swift",
                 "TongJiCanvas.entitlements",
                 "TongJiCanvasApp.swift"
             ],
-            sources: ["CanvasSignInClient.swift"]
+            sources: [
+                "AccountStore.swift",
+                "AccountTransfer.swift",
+                "CanvasSessionCookie.swift",
+                "CanvasSignInClient.swift",
+                "SignHistoryStore.swift"
+            ]
         ),
         .testTarget(
             name: "CanvasSignInCoreTests",
