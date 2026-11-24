@@ -3,7 +3,9 @@ on:
   workflow_dispatch:
   push:
     branches: [build-ios-ipa]
-    paths: [.github/workflows/build-ios-ipa.yml]
+    paths:
+      - ios/**
+      - .github/workflows/build-ios-ipa.yml
 permissions:
   contents: read
 jobs:
